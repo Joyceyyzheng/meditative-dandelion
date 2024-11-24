@@ -1,0 +1,10 @@
+! version = 2.0
+
++ say banana
+- No, YOU say banana!
+
++ banana
+- Fine, you said it. Happy now?
+
++ *
+- I won't talk to you until you say banana.
