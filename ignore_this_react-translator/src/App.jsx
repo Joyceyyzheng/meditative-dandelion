@@ -6,7 +6,7 @@ import LanguageSelector from './components/LanguageSelector';
 import Progress from './components/Progress';
 import ChatBot from "./components/Chatbot";
 import DandelionBot from "./components/DandelionBot";
-import RiveBot from "./components/BotRive";
+// import RiveBot from "./components/BotRive";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -56,7 +56,7 @@ function App() {
 
       {/* <ChatBot /> */}
       <DandelionBot />
-      <RiveBot />
+      {/*<RiveBot />*/}
 
       {/* <div className='container'>
         <div className='language-container'>
