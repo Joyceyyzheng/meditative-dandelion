@@ -16,7 +16,7 @@ import { PerspectiveCamera } from "@react-three/drei";
 import Fireflies from "./Fireflies";
 // import AnimatedFlower from './AnimatedFlower';
 import AnimatedFlowerTime from "./AnimatedFlower_time";
-// import DandelionBot from "./DandelionBot";
+import DandelionBot from "./DandelionBot"; //⚠️where it's causing the error.
 
 function App() {
   const dayPhase = useStore((state) => state.dayPhase);
