@@ -13,7 +13,7 @@ export default function Scene() {
 
     return <>
         <group position={[0, -1, 1]} scale={[2, 2, 2]}>
-            <primitive object={fbx_dirt} position={[0, -0.05, -0.2]} />
+            <primitive object={fbx_dirt} position={[0, -0.05, 0.2]} scale={[1, 2, 1]} />
             {/* <primitive object={fbx_flower} position={[0, 0, 0]} /> */}
             {/* <primitive object={fbx_tree} position={[0, 0, 0]} /> */}
             <primitive object={test_model.scene} position={[0, -0.5, -0.7]} scale={[0.03, 0.03, 0.03]} />

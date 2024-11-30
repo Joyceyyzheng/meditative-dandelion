@@ -73,6 +73,16 @@ function App() {
             <Scene />
           </mesh>
           {/* <OrbitControls /> */}
+          <OrbitControls
+            enablePan={true} // Disable dragging
+            enableRotate={false} // Allow rotation (looking around)
+            minDistance={1} // Minimum zoom distance
+            maxDistance={2.2} // Maximum zoom distance
+            minPolarAngle={Math.PI / 6} // Constrain tilt down (30°)
+            maxPolarAngle={Math.PI / 2} // Constrain tilt up (90°)
+            enableDamping={true} // Enable smooth transitions
+            dampingFactor={0.05} // Adjust damping smoothness
+          />
           <CamUsage />
         </Canvas>
       </div>

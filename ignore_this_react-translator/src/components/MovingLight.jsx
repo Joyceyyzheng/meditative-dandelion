@@ -68,8 +68,8 @@ export default function MovingLight() {
             setDayPhase(newJudgingDayPhase);
         }
         //planet moving trace
-        const startPosition = new Vector3(5, 4.5, -5);
-        const endPosition = new Vector3(-5, 2, -5);
+        const startPosition = new Vector3(5, 2.5, -5);
+        const endPosition = new Vector3(-5, 0, -5);
 
         const x = startPosition.x + (endPosition.x - startPosition.x) * time_cycle; //was *time
         const y = startPosition.y + (endPosition.y - startPosition.y) * time_cycle;
