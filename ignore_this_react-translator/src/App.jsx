@@ -2,11 +2,18 @@ import { useEffect, useRef, useState } from "react";
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import "./App.css";
+
 import LanguageSelector from './components/LanguageSelector';
 import Progress from './components/Progress';
-import ChatBot from "./components/Chatbot";
 import DandelionBot from "./components/DandelionBot";
 // import RiveBot from "./components/BotRive";
+
+import { Canvas } from "@react-three/fiber";
+import { OrbitControls } from "@react-three/drei";
+import Scene from "./components/Scene";
+import CamUsage from "./components/CamUsage";
+import MovingLight from "./components/MovingLight";
+import AnimatedFlower from "./components/AnimatedFlower";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -54,34 +61,24 @@ function App() {
   return (
     <>
 
-      {/* <ChatBot /> */}
+
       <DandelionBot />
+      <div className="canvas-container">
+        <Canvas>
+          <ambientLight intensity={4.0} />
+          <pointLight position={[-0.5, -2, 1]} intensity={1} />
+          <MovingLight />
+          <AnimatedFlower />
+          <mesh>
+            <Scene />
+          </mesh>
+          {/* <OrbitControls /> */}
+          <CamUsage />
+        </Canvas>
+      </div>
       {/*<RiveBot />*/}
 
-      {/* <div className='container'>
-        <div className='language-container'>
-          <LanguageSelector type={"Source"} defaultLanguage={"eng_Latn"} onChange={x => setSourceLanguage(x.target.value)} />
-          <LanguageSelector type={"Target"} defaultLanguage={"fra_Latn"} onChange={x => setTargetLanguage(x.target.value)} />
-        </div>
 
-        <div className='textbox-container'>
-          <textarea value={input} rows={3} onChange={e => setInput(e.target.value)}></textarea>
-          <textarea value={output} rows={3} readOnly></textarea>
-        </div>
-      </div> */}
-
-      {/* <button disabled={disabled} onClick={translate}>Translate</button>
-
-      <div className='progress-bars-container'>
-        {ready === false && (
-          <label>Loading models... (only run once)</label>
-        )}
-        {progressItems.map(data => (
-          <div key={data.file}>
-            <Progress text={data.file} percentage={data.progress} />
-          </div>
-        ))}
-      </div> */}
     </>
   )
 }

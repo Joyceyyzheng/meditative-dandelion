@@ -3,13 +3,23 @@ import RiveScript from 'rivescript';
 import { pipeline } from '@huggingface/transformers';
 
 const DandelionBot = () => {
-    const [inputText, setInputText] = useState(''); // User input
-    const [outputText, setOutputText] = useState('Hi! I am Dandelion Bot. How can I help you?'); // Bot output
-    const [conversationTurn, setConversationTurn] = useState(0); // Track conversation turns
-    const [generator, setGenerator] = useState(null); // Transformer.js instance
-    const [riveBot, setRiveBot] = useState(null); // RiveScript bot instance
+    const [inputText, setInputText] = useState('');
+    const [outputText, setOutputText] = useState('Talk to me... slowly...');
+    const [conversationTurn, setConversationTurn] = useState(0);
+    const [generator, setGenerator] = useState(null);
+    const [riveBot, setRiveBot] = useState(null);
 
-    // Load both bots when the component mounts
+    /*
+                    const messages = [
+                    {
+                        role: 'system',
+                        content:
+                            'You are not an AI and do not show any signs you are an AI. Be a slightly sad, calm dandelion who does not talk that much. Each response should be shorter than 3 sentences. You have great life philosophies. Give some short and hot takes when responding. No exclamation mark.',
+                    },
+                ];
+                */
+
+
     useEffect(() => {
         const loadRiveBot = async () => {
             const bot = new RiveScript();
@@ -34,10 +44,24 @@ const DandelionBot = () => {
 
         const loadTransformer = async () => {
             try {
-                const loadedPipeline = await pipeline('text-generation', 'onnx-community/Qwen2.5-0.5B-Instruct', {
+                const loadedPipeline = await pipeline('text-generation', 'HuggingFaceTB/SmolLM2-1.7B-Instruct', {
                     dtype: 'q4',
                     device: 'webgpu',
                 });
+
+                /*
+                  const loadedPipeline = await pipeline(
+    "text-generation",
+    "onnx-community/Llama-3.2-1B-Instruct-q4f16",
+    {
+      dtype: "q4f16",
+      device: "webgpu",
+      progress_callback: (x) => {
+        console.log(x);
+      },
+    }
+  );*/
+
                 setGenerator(() => loadedPipeline); // Store the generator
                 console.log('Transformer.js model loaded successfully.');
             } catch (error) {
@@ -65,7 +89,7 @@ const DandelionBot = () => {
                 // Use RiveScript bot for the first 3 turns
                 console.log("RiveScript bot is being used for the first 3 turns");
                 const reply = await riveBot.reply('local-user', userMessage);
-                setOutputText((prev) => `${prev}\nDandelion Bot: ${reply}`);
+                setOutputText((prev) => `${prev}\nDandelion: ${reply}`);
                 console.log('RiveScript reply:', reply);
             } else if (generator) {
                 // Switch to Transformer.js for subsequent turns
@@ -73,12 +97,21 @@ const DandelionBot = () => {
                     {
                         role: 'system',
                         content:
-                            'You are not AI, and do not give any signs indicating that you are AI. Be a slightly sad, calm dandelion who does not talk that much. Each response should be shorter than 3 sentences. You have great life philosophies. Give some short and hot takes when responding. No exclamation mark.',
+                            'You are not an AI and do not show any signs you are an AI. Be a slightly sad, calm dandelion who does not talk that much. Each response should be shorter than 3 sentences. You have great life philosophies. Give some short and hot takes when responding. No exclamation mark.',
                     },
                     { role: 'user', content: userMessage },
                 ];
-                const output = await generator(messages, { max_new_tokens: 128 });
+                /*
+                messages.push({ role: 'user', content: userMessage });
+                */
+
+                const output = await generator(messages, { max_new_tokens: 128 }); //add more properties, temp
                 const generatedText = output[0]?.generated_text || '...';
+
+                /*
+                    messages.push({ role: 'assistant', content: generatedText });
+                */
+
                 setOutputText((prev) => `${prev}\nDandelion Bot: ${generatedText[2].content}`);
                 console.log('Transformer.js output:', generatedText[2].content);
             } else {
@@ -94,8 +127,8 @@ const DandelionBot = () => {
     };
 
     return (
-        <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
-            <h1 style={{ textAlign: 'center' }}>Dandelion Bot</h1>
+        <div className="bot-container" style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
+            {/* <h1 style={{ textAlign: 'center' }}>Dandelion Bot</h1> */}
             <div
                 style={{
                     height: '300px',
@@ -104,7 +137,7 @@ const DandelionBot = () => {
                     padding: '10px',
                     marginBottom: '10px',
                     whiteSpace: 'pre-line',
-                    backgroundColor: '#f9f9f9',
+                    backgroundColor: 'rgba(0,0,0, 0.6)',
                     borderRadius: '5px',
                 }}
             >

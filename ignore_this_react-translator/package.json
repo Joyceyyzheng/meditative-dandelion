@@ -11,17 +11,17 @@
     "eject": "vite eject"
   },
   "dependencies": {
-    "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
+    "@babel/runtime": "^7.26.0",
     "@huggingface/transformers": "^3.0.2",
     "core-js": "^3.39.0",
     "process": "^0.11.10",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "regenerator-runtime": "^0.14.1",
-    "rivescript": "^2.2.1",
-    "vite-plugin-node-polyfills": "^0.22.0"
+    "rivescript": "^2.2.1"
   },
   "devDependencies": {
+    "@babel/plugin-transform-runtime": "^7.25.9",
     "@eslint/js": "^9.13.0",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
@@ -32,8 +32,5 @@
     "eslint-plugin-react-refresh": "^0.4.14",
     "globals": "^15.11.0",
     "vite": "^5.4.10"
-  },
-  "resolutions": {
-    "babel-polyfill": "npm:@empty"
   }
 }
