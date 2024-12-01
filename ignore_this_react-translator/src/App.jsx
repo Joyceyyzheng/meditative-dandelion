@@ -14,6 +14,7 @@ import Scene from "./components/Scene";
 import CamUsage from "./components/CamUsage";
 import MovingLight from "./components/MovingLight";
 import AnimatedFlower from "./components/AnimatedFlower";
+import Fireflies from "./components/Fireflies";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -63,12 +64,14 @@ function App() {
 
 
       <DandelionBot />
+
       <div className="canvas-container">
         <Canvas>
           <ambientLight intensity={4.0} />
           <pointLight position={[-0.5, -2, 1]} intensity={1} />
           <MovingLight />
           <AnimatedFlower />
+          <Fireflies />
           <mesh>
             <Scene />
           </mesh>

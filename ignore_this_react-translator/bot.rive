@@ -24,8 +24,72 @@
 + okie
 - dokie...
 
++ [*] plant [*]
+- How are other plants doing?
+
++ [*] plants [*]
+- How are other plants doing?
+
++ [*] water [*]
+- Water... I love them, I hate them.
+
++ [*] sunshine [*]
+- When winter comes I love them, but not all the time, you know.
+
++ [*] dandelion [*]
+- Hi! You just mentioned my name :D 
+
++ my name is *
+- Nice to meet you <star>!
+
++ call me *
+- Nice to meet you <star>!
+
++ i'm *
+- Nice to meet you <star>!
+
++ [*] how are you [*]
+- I'm enjoying the weather. I guess. 
+
++ * like *
+- omg I like <star2> too! What do you think of squrriels?
+
++ * love *
+- love 💖 like how I love wind! 
+- omg I love <star2> too! What do you think of squrriels?
+
++ who is *
+- I don't know who <star> is.
+
++ cool
+- coooool
+
++ good
+- good! yay!
+
 + *
-- Shhh... Watch me bloom... It‘ll take a while... Be patient...
+- Shhh... Watch me bloom. It‘ll take a while, be patient...
+- waiting for sunshine ☀️ waiting 🌼
+- how are you today?
 
 
+
+
+// Substitutions
+! sub i'm     = i am
+! sub i'd     = i would
+! sub i've    = i have
+! sub i'll    = i will
+! sub don't   = do not
+! sub isn't   = is not
+! sub you'd   = you would
+! sub you're  = you are
+! sub you've  = you have
+! sub you'll  = you will
+! sub what's  = what is
+! sub whats   = what is
+! sub what're = what are
+! sub what've = what have
+! sub what'll = what will
+! sub who's   = who is
 

@@ -1,8 +1,10 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { useThree, useFrame } from '@react-three/fiber';
+import { useThree, useFrame, useLoader } from '@react-three/fiber';
 import { DirectionalLightHelper } from 'three';
 import { Vector3, TextureLoader, DoubleSide, BackSide } from 'three';
 import { useStore } from '../store';
+import { MeshTransmissionMaterial } from '@react-three/drei';
+import * as THREE from 'three';
 
 export default function MovingLight() {
 
@@ -14,8 +16,10 @@ export default function MovingLight() {
 
     //  const [dayPhase, setDayPhase] = useState(true);
     const textureLoader = new TextureLoader();
-    const initialSkyboxTexture = textureLoader.load('skybox/day_skybox.png');
-    const [skyboxTexture, setSkyboxTexture] = useState(initialSkyboxTexture);
+    // const initialSkyboxTexture = textureLoader.load('/skybox.png');
+    const initialSkyboxTexture = useLoader(THREE.TextureLoader, '/skybox.png');
+    //  console.log(initialSkyboxTexture)
+    // const [skyboxTexture, setSkyboxTexture] = useState(initialSkyboxTexture);
     const dayTimelineRef = useRef()
 
     //the point light replacing the carved sun 
@@ -26,8 +30,6 @@ export default function MovingLight() {
     const incrementDayNumber = useStore(state => state.incrementDayNumber);
     const dayPhase = useStore(state => state.dayPhase);
     const setDayPhase = useStore(state => state.setDayPhase);
-
-
     const DAY_STAGES = {
         EARLY: 'early',
         LATE: 'late'
@@ -53,7 +55,7 @@ export default function MovingLight() {
 
     useFrame(({ clock }) => {
         const t = clock.getElapsedTime(); //set an initial realworld time and map real world time
-        const duration = 10; //⚠️ where to modify the time duration -> seconds
+        const duration = 100; //⚠️ where to modify the time duration -> seconds
         const time = (Math.sin(t / duration * Math.PI) + 1) / 2;
 
         dayTimelineRef.current = Math.cos(t / duration * Math.PI)
@@ -93,11 +95,11 @@ export default function MovingLight() {
     useEffect(() => {
         if (dayPhase) {
             const daySkyboxTexture = textureLoader.load('skybox/day_skybox.png');
-            setSkyboxTexture(daySkyboxTexture);
+            // setSkyboxTexture(daySkyboxTexture);
             incrementDayNumber();
         } else {
             const nightSkyboxTexture = textureLoader.load('skybox/night_skybox.png');
-            setSkyboxTexture(nightSkyboxTexture);
+            // setSkyboxTexture(nightSkyboxTexture);
         }
     }, [dayPhase]);
 
@@ -129,17 +131,28 @@ export default function MovingLight() {
     return (
         <>
             <directionalLight ref={lightRef} position={[5, -1, 0]} intensity={2.1} color="rgb(255, 205, 54)" />
+            <directionalLight position={[5, 10, 35]} intensity={0.1} color="rgb(255, 205, 54)" />
             {dayStage && <pointLight position={[pointLightPosition.x, pointLightPosition.y, pointLightPosition.z]} intensity={10.0} />}
 
-            <mesh ref={planetRef} rotation={[Math.PI / 2, 0, 0]} scale={[1, 1, 1]} >
+            <mesh ref={planetRef} rotation={[Math.PI / 2, 0, 0]} scale={[0.3, 0.3, 0.3]} >
                 <sphereGeometry />
-                {dayPhase && <meshStandardMaterial color="orange" map={planet_night} side={DoubleSide} />}
-                {!dayPhase && <meshStandardMaterial color="gray" map={planet_night} side={DoubleSide} />}
+                <MeshTransmissionMaterial
+                    color={"#00021c"}
+                    thickness={0.01}
+                    distortion={0.1}
+                    chromaticAberration={0.05}
+                    roughness={0.1}
+                    transmission={0.2}
+                    ior={1.5}
+                />
+                {/* <meshPhongMaterial color="#ffffff" opacity={0.1} transparent /> */}
+                {/* {dayPhase && <meshPhongMaterial color="#000000" opacity={0.5} transparent />}
+                {!dayPhase && <meshBasicMaterial color="gray" side={DoubleSide} />} */}
             </mesh>
             <mesh position={[10, 0, 0]} >
-                <boxGeometry args={[200, 200, 200]} />
-                {/* <meshBasicMaterial map={skyboxTexture} side={BackSide} /> */}
-                <meshBasicMaterial color="blue" side={BackSide} />
+                <boxGeometry args={[300, 300, 200]} />
+                <meshBasicMaterial map={initialSkyboxTexture} side={BackSide} />
+                {/* <meshBasicMaterial color="rgba(30,30,30,0.1)" side={BackSide} /> */}
             </mesh>
         </>
     );

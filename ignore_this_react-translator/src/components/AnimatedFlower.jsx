@@ -13,9 +13,11 @@ function Model() {
 
     const { actions } = useAnimations(test_model.animations, test_model.scene);
     const mixer = useRef(new THREE.AnimationMixer(null));
+    const currentActionRef = useRef(null);
+    const isReversingRef = useRef(false);
 
 
-    const desiredDuration = 139; // total duration in seconds for all animations
+    const desiredDuration = 9; // total duration in seconds for all animations⚠️
     const actualDuration = animations.reduce((acc, anim) => acc + anim.duration, 0); // sum of all animation durations
 
     const playbackSpeed = desiredDuration / actualDuration;
@@ -31,15 +33,20 @@ function Model() {
             // mixer.current.stopAllAction();
             animations.forEach(clip => {
                 const action = mixer.current.clipAction(clip);
-                action.setLoop(THREE.LoopRepeat);
+                // action.setLoop(THREE.LoopRepeat);
                 action.setDuration(desiredDuration);
+                action.setLoop(THREE.LoopOnce);
+                action.clampWhenFinished = true;
                 // action.setEffectiveTimeScale(playbackSpeed);
                 action.play();
+
+
 
             });
             return () => {
                 if (mixer.current) {
                     mixer.current.stopAllAction();
+                    mixer.current.removeEventListener("finished");
                 }
             }
         }
