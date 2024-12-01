@@ -177,6 +177,7 @@ const DandelionBot = () => {
         <div className="bot-container" style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
             {/* <h1 style={{ textAlign: 'center' }}>Dandelion Bot</h1> */}
             <div
+                className="outputText"
                 style={{
                     height: '300px',
                     overflowY: 'auto',
@@ -190,36 +191,40 @@ const DandelionBot = () => {
             >
                 {outputText}
             </div>
-            <textarea
-                rows={4}
-                cols={50}
-                value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
-                placeholder="Type your message here..."
-                style={{
-                    display: 'block',
-                    margin: '10px auto',
-                    padding: '10px',
-                    fontSize: '16px',
-                    width: '100%',
-                }}
-            />
-            <button
-                onClick={handleChat}
-                style={{
-                    display: 'block',
-                    margin: '10px auto',
-                    padding: '10px 20px',
-                    fontSize: '16px',
-                    cursor: 'pointer',
-                    backgroundColor: '#007BFF',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                }}
-            >
-                Send
-            </button>
+            <div className="input-container">
+                <textarea
+                    className="inputArea"
+                    rows={4}
+                    cols={50}
+                    value={inputText}
+                    onChange={(e) => setInputText(e.target.value)}
+                    placeholder="Type your message here..."
+                    style={{
+                        display: 'block',
+                        margin: '10px auto',
+                        padding: '10px',
+                        fontSize: '16px',
+                        width: '100%',
+                    }}
+                />
+                <button
+                    className="inputBtn"
+                    onClick={handleChat}
+                    style={{
+                        display: 'block',
+                        margin: '10px auto',
+                        padding: '10px 20px',
+                        fontSize: '16px',
+                        cursor: 'pointer',
+                        backgroundColor: '#007BFF',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                    }}
+                >
+                    Send
+                </button>
+            </div>
         </div>
     );
 };
