@@ -17,7 +17,7 @@ function Model() {
     const isReversingRef = useRef(false);
 
 
-    const desiredDuration = 9; // total duration in seconds for all animations⚠️
+    const desiredDuration = 300; // total duration in seconds for all animations⚠️
     const actualDuration = animations.reduce((acc, anim) => acc + anim.duration, 0); // sum of all animation durations
 
     const playbackSpeed = desiredDuration / actualDuration;

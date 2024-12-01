@@ -6,7 +6,7 @@ import { env } from 'onnxruntime-web';
 
 const DandelionBot = () => {
     const [inputText, setInputText] = useState('');
-    const [outputText, setOutputText] = useState('');
+    const [outputText, setOutputText] = useState('Welcome there...Sometimes I react slowly... please be patient with me :)');
     const [conversationTurn, setConversationTurn] = useState(0);
     const [generator, setGenerator] = useState(null);
     const [riveBot, setRiveBot] = useState(null);
@@ -59,51 +59,64 @@ const DandelionBot = () => {
         };
 
         loadRiveBot();
-        // loadTransformer();
+        loadTransformer();
     }, []);
 
     //decide whom to talk
-    // useEffect(() => {
-    //     if (conversationTurn === 1 | conversationTurn === 3 || conversationTurn === 5) {
-    //         setRiveTalk(false);
-    //         setTransformerTalk(true);
-    //         console.log('nobody talks')
-    //     } else if (conversationTurn % 2 === 0) {
-    //         //偶数
-    //         setRiveTalk(true);
-    //         console.log('Rive talks')
-    //     }
-    //     else if (conversationTurn % 2 !== 0 && conversationTurn !== 1 && conversationTurn !== 3 && conversationTurn !== 5) {
-    //         //奇数
-    //         setTransformerTalk(true);
-    //         console.log('Transformer talks')
-    //     }
-    //     console.log('conversationTurn:', conversationTurn);
-    // }, [conversationTurn]);
+    useEffect(() => {
+        console.log('conversationTurn:', conversationTurn);
 
-    // const handleBotMessage = (message) => {
-    //     setOutputText((prev) => `${prev}\nDandelion: ${message}`);
-    // };
+        if (conversationTurn === 1 || conversationTurn === 3 || conversationTurn === 5) {
+            setRiveTalk(false);
+            setTransformerTalk(false);
+            console.log('Nobody talks');
+        } else if (conversationTurn % 2 === 0 && conversationTurn != 0) {
+            setRiveTalk(true);
+            setTransformerTalk(false);
+            console.log('Rive talks');
+        } else {
+            setRiveTalk(false);
+            setTransformerTalk(true);
+            console.log('Transformer talks');
+        }
+    }, [conversationTurn]);
+
+
+    const handleBotMessage = (message) => {
+        setOutputText((prev) => `${prev}\nDandelion: ${message}`);
+    };
 
     //manual talk 
-    // useEffect(() => {
-    //     if (conversationTurn === 1) {
-    //         handleBotMessage('Hello there! I react slowly... please be patient with me :)');
-    //     }
-    //     if (conversationTurn === 3) {
-    //         handleBotMessage('How\'s the weather over there?');
-    //     } else if (conversationTurn === 5) {
-    //         handleBotMessage('You can actually come closer to see me bloom 🌼');
-    //     }
+    useEffect(() => {
+        if (conversationTurn === 1) {
+            handleBotMessage('🎵');
+        }
+        if (conversationTurn === 3) {
+            setTimeout(() => {
+                handleBotMessage('How\'s the weather over there?');
+            }, 1800);
 
-    // }, [conversationTurn]);
+        } else if (conversationTurn === 5) {
+            setTimeout(() => {
+                handleBotMessage('You can actually come closer to see me bloom 🌼');
+            }, 3000);
+        } else if (conversationTurn === 15) {
+            setTimeout(() => {
+                handleBotMessage('I\'m so glad you are still here. Sharing you some good luck :D');
+            }, 2000);
+        }
+
+    }, [conversationTurn]);
 
     // handle chat
     const handleChat = async () => {
         if (!inputText.trim()) return; // prevent empty input
 
         const userMessage = inputText.trim();
-        setConversationHistory((prev) => [...prev, userMessage]); //storing the message
+        setConversationHistory((prev) => [
+            ...prev,
+            { role: 'user', content: userMessage },
+        ]);//storing the message
         // setConversationHistory((prev) => [
         //     ...prev,
         //     { role: 'user', content: userMessage },
@@ -113,47 +126,44 @@ const DandelionBot = () => {
         setInputText(''); // clear the input field
 
         try {
-            if (riveBot) {
-                // Use RiveScript bot for the first 3 turns
-                //console.log("RiveScript bot is being used for the first 3 turns");
+            if (riveBot && riveTalk) {
                 const reply = await riveBot.reply('local-user', userMessage);
                 setOutputText((prev) => `${prev}\nDandelion: ${reply}`);
-                // console.log('RiveScript reply:', reply);
-                //  console.log(WebAssembly);
+            } else
+                if (transformerTalk) {
+                    console.log('Transformer.js is talking - 1');
+                    if (generator) {
+                        // Switch to Transformer.js for subsequent turns
+                        console.log('Transformer.js is talking - 2');
 
-            } else if (generator) {
-                // Switch to Transformer.js for subsequent turns
+                        const messages = [
+                            ...conversationHistory,
+                            {
+                                role: 'system',
+                                content:
+                                    'You are not an AI and do not show any signs you are an AI. Be a slightly sad, calm dandelion who does not talk that much. Each response should be shorter than 3 sentences. You have great life philosophies. Give some short and hot takes when responding. No exclamation mark.',
+                            },
+                            { role: 'user', content: userMessage },
+                        ];
 
-                const messages = [
-                    ...conversationHistory,
-                    {
-                        role: 'system',
-                        content:
-                            'You are not an AI and do not show any signs you are an AI. Be a slightly sad, calm dandelion who does not talk that much. Each response should be shorter than 3 sentences. You have great life philosophies. Give some short and hot takes when responding. No exclamation mark.',
-                    },
-                    { role: 'user', content: userMessage },
-                ];
-                /*
-                messages.push({ role: 'user', content: userMessage });
-                */
+                        const output = await generator(messages, { max_new_tokens: 128 }); //add more properties, temp
+                        const generatedText = output[0]?.generated_text || '...';
 
-                const output = await generator(messages, { max_new_tokens: 128 }); //add more properties, temp
-                const generatedText = output[0]?.generated_text || '...';
+                        /*
+                            messages.push({ role: 'assistant', content: generatedText });
+                        */
+                        //store the message from bot reply
+                        const botReply = { role: 'assistant', content: generatedText };
+                        setConversationHistory((prev) => [...prev, botReply]);
 
-                /*
-                    messages.push({ role: 'assistant', content: generatedText });
-                */
-                //store the message from bot reply
-                const botReply = { role: 'assistant', content: generatedText };
-                setConversationHistory((prev) => [...prev, botReply]);
-                // console.log('conversationHistory:', conversationHistory);
-                // setOutputText((prev) => `${prev}\nDandelion Bot: ${generatedText}`);
+                        // setOutputText((prev) => `${prev}\nDandelion Bot: ${generatedText}`);
 
-                setOutputText((prev) => `${prev}\nDandelion Bot: ${generatedText[2].content}`);
-                // console.log('Transformer.js output:', generatedText[2].content);
-            } else {
-                setOutputText((prev) => `${prev}\nDandelion Bot: Sorry, please wait...`);
-            }
+                        setOutputText((prev) => `${prev}\nDandelion Bot: ${generatedText[2].content}`);
+                        console.log('Transformer.js output:', generatedText[2].content);
+                    }
+                } else {
+                    //setOutputText((prev) => `${prev}\nDandelion Bot: Sorry, please wait...`);
+                }
         } catch (error) {
             console.error('Error generating response:', error);
             setOutputText((prev) => `${prev}\nDandelion Bot: Something went wrong.`);
