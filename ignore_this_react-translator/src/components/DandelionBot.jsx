@@ -3,15 +3,16 @@ import RiveScript from 'rivescript';
 import { pipeline } from '@huggingface/transformers';
 import { env } from 'onnxruntime-web';
 
-
 const DandelionBot = () => {
     const [inputText, setInputText] = useState('');
     const [outputText, setOutputText] = useState('Welcome there...Sometimes I react slowly... please be patient with me :)');
-    const [conversationTurn, setConversationTurn] = useState(0);
+    const [conversationTurn, setConversationTurn] = useState(1);
     const [generator, setGenerator] = useState(null);
     const [riveBot, setRiveBot] = useState(null);
     const [riveTalk, setRiveTalk] = useState(false);
     const [transformerTalk, setTransformerTalk] = useState(false);
+
+    const [latestOutput, setLatestOutput] = useState('Welcome there...Sometimes I react slowly... please be patient with me :)');
 
     const [conversationHistory, setConversationHistory] = useState([
         {
@@ -66,35 +67,40 @@ const DandelionBot = () => {
     useEffect(() => {
         console.log('conversationTurn:', conversationTurn);
 
-        if (conversationTurn === 1 || conversationTurn === 3 || conversationTurn === 5) {
+        if (conversationTurn === 1) {
             setRiveTalk(false);
             setTransformerTalk(false);
             console.log('Nobody talks');
         } else if (conversationTurn % 2 === 0 && conversationTurn != 0) {
-            setRiveTalk(true);
-            setTransformerTalk(false);
-            console.log('Rive talks');
-        } else {
+            //偶数
             setRiveTalk(false);
             setTransformerTalk(true);
-            console.log('Transformer talks');
+            console.log('Transformer talks, NOT rive');
+        } else if (conversationTurn % 2 !== 0) {
+            setRiveTalk(true);
+            setTransformerTalk(false);
+            console.log('Rive talks, NOT transformer');
         }
     }, [conversationTurn]);
 
 
     const handleBotMessage = (message) => {
         setOutputText((prev) => `${prev}\nDandelion: ${message}`);
+        setLatestOutput(message);
     };
 
     //manual talk 
     useEffect(() => {
         if (conversationTurn === 1) {
-            handleBotMessage('🎵');
+            handleBotMessage('🎵hi🎵');
+        }
+        if (conversationTurn === 2) {
+            handleBotMessage('Talk to me 🌼');
         }
         if (conversationTurn === 3) {
             setTimeout(() => {
                 handleBotMessage('How\'s the weather over there?');
-            }, 1800);
+            }, 3000);
 
         } else if (conversationTurn === 5) {
             setTimeout(() => {
@@ -108,27 +114,43 @@ const DandelionBot = () => {
 
     }, [conversationTurn]);
 
+    //⚠️合并conversation design -> 好像没法合并😅
+
+
+    //write a useeffect that fires handlechat everytime rivebot changes (maybe just the rive part)
+    useEffect(() => {
+
+        handleChat();
+        console.log("MY DEAR EXTRA HANDLECHAT fires")
+
+    }, [riveTalk, transformerTalk]);
+
     // handle chat
     const handleChat = async () => {
         if (!inputText.trim()) return; // prevent empty input
 
         const userMessage = inputText.trim();
-        setConversationHistory((prev) => [
-            ...prev,
-            { role: 'user', content: userMessage },
-        ]);//storing the message
+
+        setConversationHistory((prev) => [...prev, userMessage]); //from older version 
+        // setConversationHistory((prev) => [
+        //     ...prev,
+        //     { role: 'user', content: userMessage },
+        // ]);//storing the message
         // setConversationHistory((prev) => [
         //     ...prev,
         //     { role: 'user', content: userMessage },
         //     { role: 'system', content: 'You are not an AI and do not show any signs you are an AI. Be a slightly sad, calm dandelion who does not talk that much. Each response should be shorter than 3 sentences. You have great life philosophies. Give some short and hot takes when responding. No exclamation mark.' }, // repeat the system prompt
         // ]);
-        setOutputText((prev) => `${prev}\nYou: ${userMessage}`);
+        setOutputText((prev) => `${prev}\nYou: ${userMessage},Turn ${conversationTurn}`);
         setInputText(''); // clear the input field
-
+        console.log("rivebot CONSOLE", riveBot, riveTalk);
         try {
             if (riveBot && riveTalk) {
+                console.log('RiveScript is talking');
                 const reply = await riveBot.reply('local-user', userMessage);
                 setOutputText((prev) => `${prev}\nDandelion: ${reply}`);
+                setLatestOutput(reply);
+                // setConversationTurn((prev) => prev + 1);
             } else
                 if (transformerTalk) {
                     console.log('Transformer.js is talking - 1');
@@ -137,7 +159,7 @@ const DandelionBot = () => {
                         console.log('Transformer.js is talking - 2');
 
                         const messages = [
-                            ...conversationHistory,
+                            // ...conversationHistory,
                             {
                                 role: 'system',
                                 content:
@@ -145,6 +167,7 @@ const DandelionBot = () => {
                             },
                             { role: 'user', content: userMessage },
                         ];
+
 
                         const output = await generator(messages, { max_new_tokens: 128 }); //add more properties, temp
                         const generatedText = output[0]?.generated_text || '...';
@@ -159,7 +182,9 @@ const DandelionBot = () => {
                         // setOutputText((prev) => `${prev}\nDandelion Bot: ${generatedText}`);
 
                         setOutputText((prev) => `${prev}\nDandelion Bot: ${generatedText[2].content}`);
+                        setLatestOutput(generatedText[2].content);
                         console.log('Transformer.js output:', generatedText[2].content);
+                        // setConversationTurn((prev) => prev + 1);
                     }
                 } else {
                     //setOutputText((prev) => `${prev}\nDandelion Bot: Sorry, please wait...`);
@@ -167,15 +192,21 @@ const DandelionBot = () => {
         } catch (error) {
             console.error('Error generating response:', error);
             setOutputText((prev) => `${prev}\nDandelion Bot: Something went wrong.`);
+            setLatestOutput('Something went wrong.');
         }
 
         // conversation turn
-        setConversationTurn((prev) => prev + 1);
+        // setConversationTurn((prev) => prev + 1);
     };
 
     return (
         <div className="bot-container" style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
             {/* <h1 style={{ textAlign: 'center' }}>Dandelion Bot</h1> */}
+            <div
+                className='output-latest'
+            >
+                {latestOutput}
+            </div>
             <div
                 className="outputText"
                 style={{
@@ -194,38 +225,52 @@ const DandelionBot = () => {
             <div className="input-container">
                 <textarea
                     className="inputArea"
-                    rows={4}
-                    cols={50}
+                    // rows={4}
+                    // cols={50}
                     value={inputText}
                     onChange={(e) => setInputText(e.target.value)}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            handleChat();
+                            setConversationTurn((prev) => prev + 1);
+                        }
+                    }}
                     placeholder="Type your message here..."
                     style={{
-                        display: 'block',
-                        margin: '10px auto',
-                        padding: '10px',
-                        fontSize: '16px',
-                        width: '100%',
+                        backgroundColor: 'transparent', // Transparent background
+                        resize: 'none', // Disable resizing
+                        overflow: 'hidden', // Prevent scrollbar from appearing
+                        whiteSpace: 'nowrap', // Text flows horizontally
+
+                        border: '1px solid #ccc', // Optional border
+                        borderRadius: '4px', // Optional rounded corners
+                        color: '#fff', // Text color
+                        padding: '10px', // Padding for better text positioning
+                        fontSize: '16px', // Font size
+                        outline: 'none', // Remove outline when focused
                     }}
                 />
                 <button
                     className="inputBtn"
                     onClick={handleChat}
+                    type="submit"
                     style={{
-                        display: 'block',
-                        margin: '10px auto',
-                        padding: '10px 20px',
-                        fontSize: '16px',
-                        cursor: 'pointer',
-                        backgroundColor: '#007BFF',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
+                        // display: 'block',
+                        // margin: '10px auto',
+                        // padding: '10px 20px',
+                        // fontSize: '16px',
+                        // cursor: 'pointer',
+                        // backgroundColor: '#007BFF',
+                        // color: 'white',
+                        // border: 'none',
+                        // borderRadius: '4px',
                     }}
                 >
                     Send
                 </button>
             </div>
-        </div>
+        </div >
     );
 };
 
