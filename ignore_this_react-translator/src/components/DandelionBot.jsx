@@ -46,6 +46,7 @@ const DandelionBot = () => {
             //onnx-community/Qwen2.5-0.5B-Instruct
             //HuggingFaceTB/SmolLM2-1.7B-Instruct
             //onnx-community/Qwen2.5-1.5B-Instruct
+            //onnx-community/Llama-3.2-1B-Instruct-q4f16 - couldn't locate file at async Promise.all
             try {
                 const loadedPipeline = await pipeline('text-generation', 'onnx-community/Qwen2.5-0.5B-Instruct', {
                     dtype: 'q4',
@@ -120,8 +121,8 @@ const DandelionBot = () => {
     //write a useeffect that fires handlechat everytime rivebot changes (maybe just the rive part)
     useEffect(() => {
 
-        handleChat();
-        console.log("MY DEAR EXTRA HANDLECHAT fires")
+        // handleChat();
+        //  console.log("MY DEAR EXTRA HANDLECHAT fires")
 
     }, [riveTalk, transformerTalk]);
 
@@ -131,7 +132,11 @@ const DandelionBot = () => {
 
         const userMessage = inputText.trim();
 
-        setConversationHistory((prev) => [...prev, userMessage]); //from older version 
+        // setConversationHistory((prev) => [...prev, userMessage]); //from older version 
+        //keep the format of an object with role and content
+        setConversationHistory((prev) => [...prev, { role: 'user', content: userMessage }]);
+
+        console.log("CONVERSATION HISTORY", conversationHistory);
         // setConversationHistory((prev) => [
         //     ...prev,
         //     { role: 'user', content: userMessage },
@@ -143,7 +148,7 @@ const DandelionBot = () => {
         // ]);
         setOutputText((prev) => `${prev}\nYou: ${userMessage},Turn ${conversationTurn}`);
         setInputText(''); // clear the input field
-        console.log("rivebot CONSOLE", riveBot, riveTalk);
+        //  console.log("rivebot CONSOLE", riveBot, riveTalk);
         try {
             if (riveBot && riveTalk) {
                 console.log('RiveScript is talking');
@@ -159,17 +164,13 @@ const DandelionBot = () => {
                         console.log('Transformer.js is talking - 2');
 
                         const messages = [
-                            // ...conversationHistory,
-                            {
-                                role: 'system',
-                                content:
-                                    'You are not an AI and do not show any signs you are an AI. Be a slightly sad, calm dandelion who does not talk that much. Each response should be shorter than 3 sentences. You have great life philosophies. Give some short and hot takes when responding. No exclamation mark.',
-                            },
+                            ...conversationHistory,
                             { role: 'user', content: userMessage },
                         ];
 
 
                         const output = await generator(messages, { max_new_tokens: 128 }); //add more properties, temp
+                        //increase the input tokens will make it remember longer history?
                         const generatedText = output[0]?.generated_text || '...';
 
                         /*
@@ -177,13 +178,14 @@ const DandelionBot = () => {
                         */
                         //store the message from bot reply
                         const botReply = { role: 'assistant', content: generatedText };
-                        setConversationHistory((prev) => [...prev, botReply]);
+                        setConversationHistory((prev) => [...prev, generatedText[generatedText.length - 1]]);
+                        console.log("generated text", generatedText)
 
                         // setOutputText((prev) => `${prev}\nDandelion Bot: ${generatedText}`);
 
-                        setOutputText((prev) => `${prev}\nDandelion Bot: ${generatedText[2].content}`);
-                        setLatestOutput(generatedText[2].content);
-                        console.log('Transformer.js output:', generatedText[2].content);
+                        setOutputText((prev) => `${prev}\nDandelion Bot: ${generatedText[generatedText.length - 1].content}`);
+                        setLatestOutput(generatedText[generatedText.length - 1].content);
+                        console.log('Transformer.js output:', generatedText[generatedText.length - 1].content);
                         // setConversationTurn((prev) => prev + 1);
                     }
                 } else {
@@ -196,7 +198,7 @@ const DandelionBot = () => {
         }
 
         // conversation turn
-        // setConversationTurn((prev) => prev + 1);
+        setConversationTurn((prev) => prev + 1);
     };
 
     return (
@@ -233,7 +235,7 @@ const DandelionBot = () => {
                         if (e.key === 'Enter') {
                             e.preventDefault();
                             handleChat();
-                            setConversationTurn((prev) => prev + 1);
+                            // setConversationTurn((prev) => prev + 1);
                         }
                     }}
                     placeholder="Type your message here..."
