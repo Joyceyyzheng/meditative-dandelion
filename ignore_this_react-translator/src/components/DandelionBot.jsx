@@ -48,9 +48,15 @@ const DandelionBot = () => {
             //onnx-community/Qwen2.5-1.5B-Instruct
             //onnx-community/Llama-3.2-1B-Instruct-q4f16 - couldn't locate file at async Promise.all
             try {
-                const loadedPipeline = await pipeline('text-generation', 'onnx-community/Qwen2.5-0.5B-Instruct', {
-                    dtype: 'q4',
-                    device: 'webgpu',
+                // const loadedPipeline = await pipeline('text-generation', 'onnx-community/Qwen2.5-0.5B-Instruct', {
+                // const loadedPipeline = await pipeline('text-generation', 'onnx-community/Llama-3.2-1B-Instruct-q4f16', {
+                const loadedPipeline = await pipeline('text-generation', 'onnx-community/Qwen2.5-1.5B-Instruct', {
+                    // dtype: 'q4',
+                    // dtype: "q4f16",
+                    // device: 'webgpu',
+                    progress_callback: (x) => {
+                        console.log(x);
+                    },
                 });
 
                 setGenerator(() => loadedPipeline); // Store the generator
@@ -93,7 +99,7 @@ const DandelionBot = () => {
     //manual talk 
     useEffect(() => {
         if (conversationTurn === 1) {
-            handleBotMessage('🎵hi🎵');
+            handleBotMessage('🎵hi🎵I react slowly, please be patient with me, especially when the fireflies aren\'t moving :)');
         }
         if (conversationTurn === 2) {
             handleBotMessage('Talk to me 🌼');
@@ -101,16 +107,16 @@ const DandelionBot = () => {
         if (conversationTurn === 3) {
             setTimeout(() => {
                 handleBotMessage('How\'s the weather over there?');
-            }, 3000);
+            }, 5000);
 
         } else if (conversationTurn === 5) {
             setTimeout(() => {
                 handleBotMessage('You can actually come closer to see me bloom 🌼');
-            }, 3000);
+            }, 5000);
         } else if (conversationTurn === 15) {
             setTimeout(() => {
                 handleBotMessage('I\'m so glad you are still here. Sharing you some good luck :D');
-            }, 2000);
+            }, 5000);
         }
 
     }, [conversationTurn]);
@@ -164,7 +170,11 @@ const DandelionBot = () => {
                         console.log('Transformer.js is talking - 2');
 
                         const messages = [
-                            ...conversationHistory,
+                            {
+                                role: 'system',
+                                content:
+                                    'You are not an AI and do not show any signs you are an AI. Be a slightly sad, calm dandelion who does not talk that much. Each response should be shorter than 3 sentences. You have great life philosophies. Give some short and hot takes when responding. No exclamation mark.',
+                            },
                             { role: 'user', content: userMessage },
                         ];
 
@@ -183,9 +193,12 @@ const DandelionBot = () => {
 
                         // setOutputText((prev) => `${prev}\nDandelion Bot: ${generatedText}`);
 
-                        setOutputText((prev) => `${prev}\nDandelion Bot: ${generatedText[generatedText.length - 1].content}`);
-                        setLatestOutput(generatedText[generatedText.length - 1].content);
-                        console.log('Transformer.js output:', generatedText[generatedText.length - 1].content);
+                        // setOutputText((prev) => `${prev}\nDandelion Bot: ${generatedText[generatedText.length - 1].content}`);
+                        // setLatestOutput(generatedText[generatedText.length - 1].content);
+                        // console.log('Transformer.js output:', generatedText[generatedText.length - 1].content);
+                        setOutputText((prev) => `${prev}\nDandelion Bot: ${generatedText[2].content}`);
+                        setLatestOutput(generatedText[2].content);
+                        console.log('Transformer.js output:', generatedText[2].content);
                         // setConversationTurn((prev) => prev + 1);
                     }
                 } else {
@@ -209,7 +222,7 @@ const DandelionBot = () => {
             >
                 {latestOutput}
             </div>
-            <div
+            {/* <div
                 className="outputText"
                 style={{
                     height: '300px',
@@ -223,7 +236,7 @@ const DandelionBot = () => {
                 }}
             >
                 {outputText}
-            </div>
+            </div> */}
             <div className="input-container">
                 <textarea
                     className="inputArea"
