@@ -102,7 +102,7 @@ const DandelionBot = () => {
             handleBotMessage('🎵hi🎵I react slowly, please be patient with me, especially when the fireflies aren\'t moving :)');
         }
         if (conversationTurn === 2) {
-            handleBotMessage('Talk to me 🌼');
+            handleBotMessage('Hi there! Welcome 🌼');
         }
         if (conversationTurn === 3) {
             setTimeout(() => {

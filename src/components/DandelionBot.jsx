@@ -50,8 +50,8 @@ const DandelionBot = () => {
             try {
                 // const loadedPipeline = await pipeline('text-generation', 'onnx-community/Qwen2.5-0.5B-Instruct', {
                 // const loadedPipeline = await pipeline('text-generation', 'onnx-community/Llama-3.2-1B-Instruct-q4f16', {
-                const loadedPipeline = await pipeline('text-generation', 'onnx-community/Qwen2.5-1.5B-Instruct', {
-                    // dtype: 'q4',
+                const loadedPipeline = await pipeline('text-generation', 'onnx-community/Qwen2.5-0.5B-Instruct', {
+                    dtype: 'q4',
                     // dtype: "q4f16",
                     // device: 'webgpu',
                     progress_callback: (x) => {
